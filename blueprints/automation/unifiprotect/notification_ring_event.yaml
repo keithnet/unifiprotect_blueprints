@@ -290,36 +290,10 @@ action:
           {% endif %}]
   - service: whatsapp.send_message
     data:
-      message: "{{ notification_message }}"
-      title: "{{ notification_title }}"
-      data:
-        # Android/iOS notification tag
-        tag: "{{ notification_tag }}"
-        # Android notification Channel
-        channel: "{{ notification_channel }}"
-        # Android high prority
-        ttl: 0
-        priority: high
-        # iOS high prority
-        time-sensitive: 1
-        image: "{{ notification_image }}"
-        # only for iOS
-        entity_id: "{{ camera_entity_id }}"
-        actions: >
-          [{% if notification_url != None %}
-          { "action": "URI", "title": "Open Camera", "uri": "{{ notification_url }}" },
-          {% endif %}
-          {% if lock_entity_id != "" %}
-          { "action": "{{ unlock_action }}", "title": "{{ unlock_text }}" },
-          {% endif %}
-          {% if wait_tts_enabled %}
-          { "action": "{{ tts_action }}", "title": "Respond" },
-          {% endif %}
-          {% if input_silence_timer > 0 %}
-          { "action": "{{ silence_action }}", "title": "Silence", "destructive": True },
-          {% endif %}]
-
-    !input sonos_targets
+      clientId: "default"
+      to: "{{ }}@@s.whatsapp.net"
+      body: 
+        text: "{{ notification_title }} {{ notification_message }}"
   # send the notification twice, once with video and once without. Second one will replace the first
   # attaching a video to a notification can delay the notification
   - choose:
