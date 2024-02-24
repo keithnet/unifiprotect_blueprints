@@ -249,6 +249,7 @@ variables:
   wait_tts_enabled: "{{ input_tts_target != '' and input_wait_tts != '' and media_entity_id != None }}"
   input_notify_whatsapps: !input notify_whatsapps
   input_audio_url: audio_url
+  sonos_entity_id: "{{ sonos_targets | default([None]) | first }}"
 
 
 trigger:
@@ -267,7 +268,7 @@ action:
         volume: 18
     target:
       entity_id: >-
-        {{ sonos_targets }}  
+        {{ sonos_entity_id }}  
   - service: "{{ input_notify_target_app }}"
     data:
       message: "{{ notification_message }}"
