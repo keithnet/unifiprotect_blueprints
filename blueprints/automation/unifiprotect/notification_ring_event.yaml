@@ -18,8 +18,7 @@ blueprint:
       - Time formatting strings. Timestamp is injected into the notification in case the notification is delay.
       - Cooldown before sending another notification
       - Silence timer for muting notifications via Actionable Notification (docs: [Mobile][2])
-      - Configurable lovelace view from notification
-      - Scrypted Doorbell URL (Keith Added)
+      - Configurable lovelace view from notification (which could be an external URL, i.e. scrypted)
       - Notification targets for WhatsApp (Keith Added)
       - Sonos Targets (Keith Added)
       - Sonos Audio URL (Keith Added)
@@ -151,6 +150,7 @@ blueprint:
       name: (Optional) Lovelace View
       description: |
         Home Assistant Lovelace view to open when clicking notification.
+        This could also be an external URL, i.e. scrypted.
         If left blank, URI Notification actions will not be generated.
       default: ""
       selector:
@@ -160,13 +160,6 @@ blueprint:
       description: >
         Debug Event ID for UniFi Protect to use for when manually triggering automation.
         Will be used to generate a thumbnail for testing notifications.
-      default: ""
-      selector:
-        text:
-    scrypted_doorbell_url:
-      name: (Optional) URL to camera in Scrypted for 2-way audio
-      description: >
-        include link in notification to do 2-way audio
       default: ""
       selector:
         text:
@@ -254,6 +247,9 @@ variables:
   tts_action: "tts-ring-{{ input_doorbell }}"
   lock_tts_enabled: "{{ input_tts_target != '' and input_lock_tts != '' and media_entity_id != None }}"
   wait_tts_enabled: "{{ input_tts_target != '' and input_wait_tts != '' and media_entity_id != None }}"
+  input_notify_whatsapps: !input notify_whatsapps
+  input_sonos_audio_url: !input sonos_audio_url
+
 
 trigger:
   - platform: state
@@ -292,6 +288,38 @@ action:
           {% if input_silence_timer > 0 %}
           { "action": "{{ silence_action }}", "title": "Silence", "destructive": True },
           {% endif %}]
+  - service: whatsapp.send_message
+    data:
+      message: "{{ notification_message }}"
+      title: "{{ notification_title }}"
+      data:
+        # Android/iOS notification tag
+        tag: "{{ notification_tag }}"
+        # Android notification Channel
+        channel: "{{ notification_channel }}"
+        # Android high prority
+        ttl: 0
+        priority: high
+        # iOS high prority
+        time-sensitive: 1
+        image: "{{ notification_image }}"
+        # only for iOS
+        entity_id: "{{ camera_entity_id }}"
+        actions: >
+          [{% if notification_url != None %}
+          { "action": "URI", "title": "Open Camera", "uri": "{{ notification_url }}" },
+          {% endif %}
+          {% if lock_entity_id != "" %}
+          { "action": "{{ unlock_action }}", "title": "{{ unlock_text }}" },
+          {% endif %}
+          {% if wait_tts_enabled %}
+          { "action": "{{ tts_action }}", "title": "Respond" },
+          {% endif %}
+          {% if input_silence_timer > 0 %}
+          { "action": "{{ silence_action }}", "title": "Silence", "destructive": True },
+          {% endif %}]
+
+    !input sonos_targets
   # send the notification twice, once with video and once without. Second one will replace the first
   # attaching a video to a notification can delay the notification
   - choose:
