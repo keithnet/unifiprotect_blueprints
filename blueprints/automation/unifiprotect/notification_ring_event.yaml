@@ -180,8 +180,8 @@ blueprint:
           domain: media_player
           device_class: speaker
           multiple: true
-    sonos_audio_url:
-      name: (Optional) URL for chime (Audio) for Sonos
+    audio_url:
+      name: (Optional) URL for chime (Audio) for media player
       description: >
         WAV file to play when doorbell rings
       default: ""
@@ -248,7 +248,7 @@ variables:
   lock_tts_enabled: "{{ input_tts_target != '' and input_lock_tts != '' and media_entity_id != None }}"
   wait_tts_enabled: "{{ input_tts_target != '' and input_wait_tts != '' and media_entity_id != None }}"
   input_notify_whatsapps: !input notify_whatsapps
-  input_sonos_audio_url: !input sonos_audio_url
+  input_audio_url: audio_url
 
 
 trigger:
@@ -260,7 +260,7 @@ trigger:
 action:
   - service: media_player.play_media
     data:
-      media_content_id: "{{ input_sonos_audio_url }}"
+      media_content_id: "{{ input_audio_url }}"
       media_content_type: music
       announce: true
       extra:
