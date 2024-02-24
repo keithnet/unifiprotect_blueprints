@@ -260,7 +260,7 @@ trigger:
 action:
   - service: media_player.play_media
     data:
-      media_content_id: {{ input_sonos_audio_url }}
+      media_content_id: "{{ input_sonos_audio_url }}"
       media_content_type: music
       announce: true
       extra:
