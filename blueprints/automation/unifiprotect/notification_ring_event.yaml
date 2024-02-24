@@ -291,7 +291,7 @@ action:
   - service: "whatsapp.send_message"
     data:
       clientId: "default"
-      to: "{{ notify_whatsapps }}@@s.whatsapp.net"
+      to: "{{ input_notify_whatsapps }}@@s.whatsapp.net"
       body: 
         text: "{{ notification_title }} {{ notification_message }}"
   # send the notification twice, once with video and once without. Second one will replace the first
