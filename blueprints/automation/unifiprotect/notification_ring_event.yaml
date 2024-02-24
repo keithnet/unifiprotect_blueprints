@@ -166,7 +166,7 @@ blueprint:
     notify_whatsapps:
       name: (Optional) Notification targets for WhatsApp (Keith Added)
       description: >
-        Phone number of WhatsApp targets 
+        Phone number of WhatsApp targets (enter as +12015551212@s.whatsapp.net)
       default: ""
       selector:
         text:
@@ -301,7 +301,7 @@ action:
   - service: "whatsapp.send_message"
     data:
       clientId: "default"
-      to: "{{ input_notify_whatsapps }}@s.whatsapp.net"
+      to: "{{ input_notify_whatsapps }}"
       body: 
         text: "{{ notification_title }} {{ notification_message }}"     
   # send the notification twice, once with video and once without. Second one will replace the first
