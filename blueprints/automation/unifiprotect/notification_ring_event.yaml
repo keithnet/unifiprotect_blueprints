@@ -19,6 +19,10 @@ blueprint:
       - Cooldown before sending another notification
       - Silence timer for muting notifications via Actionable Notification (docs: [Mobile][2])
       - Configurable lovelace view from notification
+      - Scrypted Doorbell URL (Keith Added)
+      - Notification targets for WhatsApp (Keith Added)
+      - Sonos Targets (Keith Added)
+      - Sonos Audio URL (Keith Added)
 
     ### Requirements
 
@@ -159,6 +163,37 @@ blueprint:
       default: ""
       selector:
         text:
+    scrypted_doorbell_url:
+      name: (Optional) URL to camera in Scrypted for 2-way audio
+      description: >
+        include link in notification to do 2-way audio
+      default: ""
+      selector:
+        text:
+    notify_whatsapps:
+      name: (Optional) Notification targets for WhatsApp (Keith Added)
+      description: >
+        Phone number of WhatsApp targets 
+      default: ""
+      selector:
+        text:
+    sonos_targets:
+      name: (Optional) Sonos devices to play chime
+      description: >
+        Media Players to play Chime
+      default: ""
+      selector:
+        text:
+    sonos_audio_url:
+      name: (Optional) URL for chime (Audio) for Sonos
+      description: >
+        WAV file to play when doorbell rings
+      default: ""
+      selector:
+        entity:
+          domain: media_player
+          device_class: speaker
+          multiple: true
 
 mode: single
 max_exceeded: silent
