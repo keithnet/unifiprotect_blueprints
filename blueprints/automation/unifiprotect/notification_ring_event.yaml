@@ -22,7 +22,8 @@ blueprint:
       - Notification targets for WhatsApp (Keith Added)
       - Sonos Targets (Keith Added)
       - Sonos Audio URL (Keith Added)
-      - Added another lock_entity
+      - Added another lock_entity (Keith Added)
+      - Added another lovelace_view (Keith Added
 
     ### Requirements
 
@@ -166,6 +167,15 @@ blueprint:
       default: ""
       selector:
         text:
+    lovelace2_view:
+      name: (Optional) Lovelace View #2
+      description: |
+        Home Assistant Lovelace view to open when clicking notification.
+        This could also be an external URL, i.e. scrypted.
+        If left blank, URI Notification actions will not be generated.
+      default: ""
+      selector:
+        text:        
     debug_event_id:
       name: (Optional) Debug Event ID
       description: >
