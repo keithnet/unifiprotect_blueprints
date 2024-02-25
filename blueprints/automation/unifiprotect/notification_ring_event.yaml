@@ -282,7 +282,6 @@ variables:
   wait_tts_enabled: "{{ input_tts_target != '' and input_wait_tts != '' and media_entity_id != None }}"
   input_notify_whatsapps: !input notify_whatsapps
   input_audio_url: !input audio_url
-  sonos_entity_id: "{{ sonos_targets | default([None]) | first }}"
 
 
 trigger:
