@@ -22,6 +22,7 @@ blueprint:
       - Notification targets for WhatsApp (Keith Added)
       - Sonos Targets (Keith Added)
       - Sonos Audio URL (Keith Added)
+      - Added another lock_entity
 
     ### Requirements
 
@@ -58,6 +59,16 @@ blueprint:
       selector:
         entity:
           domain: [ lock, cover ]
+    lock2_entity:
+      name: (Optional) Door Lock or Gate Entity #2
+      description: >
+        The entity to provide an actionable notification to unlock on doorbell
+        ring. The time interval you have to respond to the unlock action is controlled
+        by "Cooldown". Short Cooldown timers may prevent you from unlocking the door.
+      default: ""
+      selector:
+        entity:
+          domain: [ lock, cover ]          
     tts_target:
       name: (Optional) TTS Service
       description: >
@@ -170,15 +181,14 @@ blueprint:
       default: ""
       selector:
         text:
-    sonos_targets:
+     sonos_targets:
       name: (Optional) Sonos devices to play chime
       description: >
         Media Players to play Chime
-      default: ""
+      default: []
       selector:
         entity:
           domain: media_player
-          device_class: speaker
           multiple: true
     audio_url:
       name: (Optional) URL for chime (Audio) for media player
@@ -195,6 +205,7 @@ variables:
   # input vars
   input_doorbell: !input doorbell_sensor
   input_lock_entity: !input lock_entity
+  input_lock2_entity: !input lock2_entity
   input_lock_tts: !input lock_tts
   input_wait_tts: !input wait_tts
   input_tts_target: !input tts_target
@@ -220,6 +231,7 @@ variables:
   camera_entities: '[{% for eid in device_entities(device_id) %}{%if eid.startswith(''camera'') and not ''package'' in eid and not is_state(eid, ''unavailable'') %}"{{ eid }}",{% endif %}{% endfor %}]'
   camera_entity_id: "{{ camera_entities | default([None]) | first }}"
   lock_entity_id: "{{ input_lock_entity or '' }}"
+  lock2_entity_id: "{{ input_lock2_entity or '' }}"
   media_entities: '[{% for eid in device_entities(device_id) %}{%if eid.startswith(''media_player'') and not is_state(eid, ''unavailable'') %}"{{ eid }}",{% endif %}{% endfor %}]'
   media_entity_id: "{{ media_entities | default([None]) | first }}"
   event_id: "{% if is_manual %}{{ input_debug_event_id }}{% else %}{{ state_attr(entity_id, 'event_id') }}{% endif %}"
@@ -243,6 +255,9 @@ variables:
   unlock_text: "{% if lock_entity_id.startswith('cover') %}Open Gate{% else %}Unlock Door{% endif %}"
   unlock_service: "{% if lock_entity_id.startswith('cover') %}cover.open_cover{% else %}lock.unlock{% endif %}"
   unlock_action: "unlock-ring-{{ lock_entity_id }}"
+  unlock2_text: "{% if lock2_entity_id.startswith('cover') %}Open Gate{% else %}Unlock Door{% endif %}"
+  unlock2_service: "{% if lock2_entity_id.startswith('cover') %}cover.open_cover{% else %}lock.unlock{% endif %}"
+  unlock2_action: "unlock-ring-{{ lock2_entity_id }}"  
   silence_action: "silence-ring-{{ entity_id }}"
   tts_action: "tts-ring-{{ input_doorbell }}"
   lock_tts_enabled: "{{ input_tts_target != '' and input_lock_tts != '' and media_entity_id != None }}"
@@ -267,8 +282,7 @@ action:
       extra:
         volume: 18
     target:
-      entity_id: >-
-        {{ sonos_entity_id }}  
+      entity_id: "{{  sonos_targets }}"
   - service: "{{ input_notify_target_app }}"
     data:
       message: "{{ notification_message }}"
@@ -293,6 +307,9 @@ action:
           {% if lock_entity_id != "" %}
           { "action": "{{ unlock_action }}", "title": "{{ unlock_text }}" },
           {% endif %}
+          {% if lock2_entity_id != "" %}
+          { "action": "{{ unlock2_action }}", "title": "{{ unlock2_text }}" },
+          {% endif %}
           {% if wait_tts_enabled %}
           { "action": "{{ tts_action }}", "title": "Respond" },
           {% endif %}
@@ -304,7 +321,7 @@ action:
       clientId: "default"
       to: "{{ input_notify_whatsapps }}"
       body: 
-        text: "{{ notification_title }} {{ notification_message }}"     
+        text: "{{ notification_title }} {{ notification_message }}. {{ notification_url }}"     
   # send the notification twice, once with video and once without. Second one will replace the first
   # attaching a video to a notification can delay the notification
   - choose:
