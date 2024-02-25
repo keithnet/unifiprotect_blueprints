@@ -292,15 +292,6 @@ trigger:
     to: "on"
 
 action:
-  - service: media_player.play_media
-    data:
-      media_content_id: "{{ input_audio_url }}"
-      media_content_type: music
-      announce: true
-      extra:
-        volume: 18
-    target:
-      entity_id: "{{ sonos_targets }}"
   - service: "{{ input_notify_target_app }}"
     data:
       message: "{{ notification_message }}"
