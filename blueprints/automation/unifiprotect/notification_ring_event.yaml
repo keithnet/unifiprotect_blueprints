@@ -195,7 +195,7 @@ blueprint:
       name: (Optional) Sonos devices to play chime
       description: >
         Media Players to play Chime
-      default: ""
+      default: []
       selector:
         entity:
           domain: media_player
